@@ -1,48 +1,48 @@
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+// function sleep(ms) {
+//     return new Promise(resolve => setTimeout(resolve, ms));
+// }
 
-function BubbleSwaps(refs, swaps, numArrayLen, currStep) {
-    console.log('Swapping')
+// function BubbleSwaps(refs, swaps, numArrayLen, currStep) {
+//     console.log('Swapping')
 
-    let positions = {}
-    let origPositions = {}
-    for (let i = 0; i < numArrayLen; i++) {
-        positions[i] = refs[i].current.getBoundingClientRect().x
-        origPositions[i] = refs[i].current.getBoundingClientRect().x
-    }
+//     let positions = {}
+//     let origPositions = {}
+//     for (let i = 0; i < numArrayLen; i++) {
+//         positions[i] = refs[i].current.getBoundingClientRect().x
+//         origPositions[i] = refs[i].current.getBoundingClientRect().x
+//     }
 
-    const translations = []
-    for (let i = 0; i < swaps.length; i++) {
-        const swap = swaps[i]
-        const bar1 = refs[swap[0].index].current
-        const bar2 = refs[swap[1].index].current
+//     const translations = []
+//     for (let i = 0; i < swaps.length; i++) {
+//         const swap = swaps[i]
+//         const bar1 = refs[swap[0].index].current
+//         const bar2 = refs[swap[1].index].current
 
-        const bar1Pos = positions[swap[0].index]
-        const bar2Pos = positions[swap[1].index]
-        const bar1OrigPos = origPositions[swap[0].index]
-        const bar2OrigPos = origPositions[swap[1].index]
+//         const bar1Pos = positions[swap[0].index]
+//         const bar2Pos = positions[swap[1].index]
+//         const bar1OrigPos = origPositions[swap[0].index]
+//         const bar2OrigPos = origPositions[swap[1].index]
 
-        const translateX1Amt = bar2Pos - bar1OrigPos
-        const translateX2Amt = bar1Pos - bar2OrigPos
-        // bar1.style.transform = `translateX(${translateX1Amt}px)`
-        // bar2.style.transform = `translateX(${translateX2Amt}px)`
+//         const translateX1Amt = bar2Pos - bar1OrigPos
+//         const translateX2Amt = bar1Pos - bar2OrigPos
+//         // bar1.style.transform = `translateX(${translateX1Amt}px)`
+//         // bar2.style.transform = `translateX(${translateX2Amt}px)`
 
-        // translations.push({
-        //     'bar1': {'index': swap[0].index, 'x': translateX1Amt },
-        //     'bar2': {'index': swap[1].index, 'x': translateX2Amt },
-        // })
-        translations.push({
-            'bar1': {'ref': bar1, 'translation': `translateX(${translateX1Amt}px)`},
-            'bar2': {'ref': bar2, 'translation': `translateX(${translateX2Amt}px)`},
-        })
+//         // translations.push({
+//         //     'bar1': {'index': swap[0].index, 'x': translateX1Amt },
+//         //     'bar2': {'index': swap[1].index, 'x': translateX2Amt },
+//         // })
+//         translations.push({
+//             'bar1': {'ref': bar1, 'translation': `translateX(${translateX1Amt}px)`},
+//             'bar2': {'ref': bar2, 'translation': `translateX(${translateX2Amt}px)`},
+//         })
 
-        positions[swap[0].index] = bar2Pos
-        positions[swap[1].index] = bar1Pos
-        // await sleep(550)
-    }
-    return translations
-}
+//         positions[swap[0].index] = bar2Pos
+//         positions[swap[1].index] = bar1Pos
+//         // await sleep(550)
+//     }
+//     return translations
+// }
 
 function origBubblePositions(refs, numArrayLen, barWidth, barMargin) {
     let lowest = 10000

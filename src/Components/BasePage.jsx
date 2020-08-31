@@ -1,64 +1,31 @@
 import React, { createRef, useEffect } from 'react';
-import { makeStyles, createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/core/styles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Divider from '@material-ui/core/Divider';
 import Box from '@material-ui/core/Box';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
+import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
+import SkipNextIcon from '@material-ui/icons/SkipNext';
+import Grid from '@material-ui/core/Grid';
+import Slider from '@material-ui/core/Slider';
 
+import useStyles from './Styles'
+import theme from './Themes'
+import TopAppBar from './TopAppBar'
 import BarContainer from './BarContainer'
 import {BubbleSort, BubblePositions} from '../Algorithms/BubbleSort';
+import BotAppBar from './BotAppBar';
 
 const ARRAY_LENGTH = 10
 const BAR_WIDTH = 50
 const BAR_MARGIN = 2
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        backgroundColor: '#008B8B',
-    },
-    btmAppBar: {
-        top: 'auto',
-        bottom: 0,
-        alignItems: 'center',
-    },
-    btnContainer: {
-        marginLeft: theme.spacing(3),
-    },
-    sortBtn: {
-    },
-    navTitleContainer: {
-        marginLeft: 'auto'
-    },
-    iconButton: {
-        marginRight: theme.spacing(1)
-    },
-    icon: {
-        marginRight: theme.spacing(1)
-    },
-}));
-
-const theme = createMuiTheme({
-    palette: {
-        primary: {
-            main: '#263238',
-        },
-    }
-})
-
-const btnTheme = createMuiTheme({
-    palette: {
-        primary: {
-            main: '#03a9f4',
-        },
-        secondary: {
-            main: '#FFFFFF',
-        },
-    },
-});
 
 function arrayGenerator(arrayLen) {
     const numArray = []
@@ -72,7 +39,24 @@ function arrayGenerator(arrayLen) {
     return numArray
 }
 
-function sortAnimation(swaps, currStep, refs, allPositions, prevBars) {
+function createRefs() {
+    const refs = {}
+    for (let i = 0; i < ARRAY_LENGTH; i++) {
+        refs[i] = createRef()
+    }
+    return refs
+}
+
+function resetBars(refs) {
+    for (let i = 0; i < ARRAY_LENGTH; i++) {
+        const ref = refs[i]
+        const bar = ref.current
+        bar.style.transform = 'none'
+        bar.style.backgroundColor = 'black'
+    }
+}
+
+function sortAnimation(swaps, currStep, refs, allPositions) {
     if (currStep !== 0) {
         const prevSwap = swaps[currStep - 1]
         refs[prevSwap[0].index].current.style.backgroundColor = 'black'
@@ -94,8 +78,8 @@ function sortAnimation(swaps, currStep, refs, allPositions, prevBars) {
     const translateX1Amt = bar2Pos - bar1OrigPos
     const translateX2Amt = bar1Pos - bar2OrigPos
 
-    bar1.style.backgroundColor = 'red'
-    bar2.style.backgroundColor = 'red'
+    bar1.style.backgroundColor = theme.palette.secondary.dark
+    bar2.style.backgroundColor = theme.palette.secondary.light
     bar1.style.transform = `translateX(${translateX1Amt}px)`
     bar2.style.transform = `translateX(${translateX2Amt}px)`
 
@@ -105,30 +89,15 @@ function sortAnimation(swaps, currStep, refs, allPositions, prevBars) {
     }
 }
 
-function createRefs() {
-    const refs = {}
-    for (let i = 0; i < ARRAY_LENGTH; i++) {
-        refs[i] = createRef()
-    }
-    return refs
-}
-
-function resetBars(refs) {
-    for (let i = 0; i < ARRAY_LENGTH; i++) {
-        const ref = refs[i]
-        const bar = ref.current
-        bar.style.transform = 'none'
-        bar.style.backgroundColor = 'black'
-    }
-}
-
 function BasePage() {
     const classes = useStyles()
     const [numArray, setArray] = React.useState(arrayGenerator(ARRAY_LENGTH))
     const [paused, setPaused] = React.useState(true)
     const [currStep, setStep] = React.useState(0)
     const [sort, setSort] = React.useState('bubble')
+    const [skipForward, setSkipForward] = React.useState(false)
     const [refs, setRefs] = React.useState(createRefs())
+    const [aniSpeed, setAniSpeed] = React.useState(550)
     
     useEffect(() => {
         let interval = null
@@ -137,69 +106,43 @@ function BasePage() {
         if (!paused) {
             interval = setInterval(() => {
                 const allPositions = BubblePositions(refs, swaps, numArray.length, BAR_WIDTH, BAR_MARGIN)
-                sortAnimation(swaps, currStep, refs, allPositions, [])
+                sortAnimation(swaps, currStep, refs, allPositions)
                 setStep(currStep => currStep + 1)
-            }, 300)
+                if (skipForward) {
+                    setPaused(true)
+                    setSkipForward(false)
+                }
+            }, aniSpeed)
         } else {
             clearInterval(interval);
         }
         return () => clearInterval(interval)
-    }, [paused, currStep, refs, numArray])
+    }, [paused, currStep, refs, numArray, aniSpeed, skipForward])
 
     return (
         <Box className={classes.root}>
             <ThemeProvider theme={theme}>
-
-                <AppBar position="fixed">
-                    <Toolbar>
-                        <Typography variant="h5" className={classes.title}>
-                            Sorting Stepper
-                        </Typography>
-                        <ThemeProvider theme={btnTheme}>
-                            <ButtonGroup className={classes.btnContainer} variant='text' color='primary'>
-                                <Button className={classes.asdf} color='secondary' 
-                                    onClick={ () => {
-                                        setArray(arrayGenerator(ARRAY_LENGTH))
-                                        setPaused(true)
-                                        setStep(0)
-                                        setRefs(createRefs())
-                                        resetBars(refs)
-                                    }}>
-                                    Generate Random Array
-                                </Button>
-                                <Button className={classes.sortBtn} color='secondary' 
-                                    onClick={ () => {
-                                        setSort('bubble')
-                                        setPaused(false)
-                                    }}>
-                                    Bubble Sort
-                                </Button>
-                                <Button className={classes.sortBtn} color='secondary'>
-                                    Selection Sort
-                                </Button>
-                                <Button className={classes.sortBtn} color='secondary'>
-                                    Merge Sort
-                                </Button>
-                            </ButtonGroup>
-                        </ThemeProvider>
-                    </Toolbar>
-                </AppBar>
-                <Toolbar />
+                <TopAppBar
+                    arrayLength={ARRAY_LENGTH}
+                    arrayGenerator={arrayGenerator}
+                    setArray={setArray}
+                    setPaused={setPaused}
+                    setStep={setStep}
+                    setRefs={setRefs}
+                    createRefs={createRefs}
+                    refs={refs}
+                    resetBars={resetBars}
+                    setSort={setSort}
+                />
 
                 <BarContainer numArray={numArray} refs={refs} barWidth={BAR_WIDTH} barMargin={BAR_MARGIN}/>
 
-                <AppBar position="fixed" className={classes.btmAppBar}>
-                    <Toolbar>
-                        <Box display='flex' justifyContent='center'>
-                            <Button className={classes.sortBtn} color='secondary' 
-                                onClick={ () => {setPaused(!paused)} }>
-                                {paused ? <PlayArrowIcon/> : <PauseIcon/>}
-                            </Button>
-                        </Box>
-                    </Toolbar>
-                </AppBar>
-                <Toolbar />
-
+                <BotAppBar 
+                    setPaused={setPaused}
+                    setAniSpeed={setAniSpeed}
+                    setSkipForward={setSkipForward}
+                    paused={paused}
+                />
             </ThemeProvider>
         </Box>
     );

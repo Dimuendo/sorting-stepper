@@ -6,7 +6,7 @@ import Bar from './Bar'
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        backgroundColor: '#008B8B',
+        // backgroundColor: '#008B8B',
     },
 }));
 
