@@ -5,18 +5,44 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
-import { ThemeProvider } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 
-import useStyles from './Styles'
-import theme from './Themes'
+const useStyles = makeStyles((theme) => ({
+    btnContainer: {
+        marginLeft: theme.spacing(3),
+    },
+    generateBtn: {
+        color: 'white',
+        marginLeft: '10px',
+    },
+    sortBtn: {
+        color: 'white',
+        // marginTop: '2px',
+    },
+    title: {
+    },
+    divider: {
+        backgroundColor: theme.palette.secondary.dark,
+        marginLeft: '10px',
+    },
+}));
+
+function reset(props) {
+    props.setArray(props.arrayGenerator(props.arrayLen))
+    props.setPaused(true)
+    props.setStep(0)
+    props.setRefs(props.createRefs(props.arrayLen))
+    props.resetBars(props.refs, props.arrayLen)
+    props.setSkipBackward(false)
+}
 
 function TopAppBar(props) {
     const classes = useStyles()
 
     return (
-        <ThemeProvider theme={theme}>
+        <Box>
             <AppBar position="fixed">
                 <Toolbar>
                     <Grid 
@@ -34,11 +60,13 @@ function TopAppBar(props) {
                                     className={classes.generateBtn}
                                     color='secondary' 
                                     onClick={ () => {
-                                        props.setArray(props.arrayGenerator(props.arrayLength))
-                                        props.setPaused(true)
-                                        props.setStep(0)
-                                        props.setRefs(props.createRefs())
-                                        props.resetBars(props.refs)
+                                        reset(props)
+                                        // props.setArray(props.arrayGenerator(props.arrayLen))
+                                        // props.setPaused(true)
+                                        // props.setStep(0)
+                                        // props.setRefs(props.createRefs(props.arrayLen))
+                                        // props.resetBars(props.refs, props.arrayLen)
+                                        // props.setSkipBackward(false)
                                     }}>
                                     Generate Array
                                 </Button>
@@ -48,82 +76,40 @@ function TopAppBar(props) {
                             <Button 
                                 className={classes.sortBtn}
                                 onClick={ () => {
-                                    props.setSort()
-                                    props.setPaused()
+                                    if (props.currStep !== 0) reset(props)
+                                    props.setSort('bubble')
+                                    props.setPaused(false)
                                 }}
                             >
                                 Bubble Sort
                             </Button>
                             <Button 
-                                className={classes.sortBtn} 
+                                className={classes.sortBtn}
+                                onClick={ () => {
+                                    if (props.currStep !== 0) reset(props)
+                                    props.setSort('selection')
+                                    props.setPaused(false)
+                                }}
                             >
                                 Selection Sort
+                            </Button>
+                            {/* <Button 
+                                className={classes.sortBtn} 
+                            >
+                                Quick Sort
                             </Button>
                             <Button 
                                 className={classes.sortBtn} 
                             >
                                 Merge Sort
-                            </Button>
+                            </Button> */}
                         </ButtonGroup>
                     </Grid>
                 </Toolbar>
             </AppBar>
             <Toolbar />
-        </ThemeProvider>
+        </Box>
     )
 }
 
 export default TopAppBar
-
-// {/* <AppBar position="fixed">
-//                     <Toolbar>
-//                         <Grid 
-//                             container
-//                             alignItems='center'
-//                             justify='space-between'
-//                         >
-//                             <Grid item>
-//                                 <Box display='flex'>
-//                                     <Typography variant="h5" className={classes.title} color='textPrimary'>
-//                                         Sorting Stepper
-//                                     </Typography>
-//                                     <Divider orientation="vertical" flexItem className={classes.divider} variant='fullWidth' />
-//                                     <Button
-//                                         className={classes.generateBtn}
-//                                         color='secondary' 
-//                                         onClick={ () => {
-//                                             setArray(arrayGenerator(ARRAY_LENGTH))
-//                                             setPaused(true)
-//                                             setStep(0)
-//                                             setRefs(createRefs())
-//                                             resetBars(refs)
-//                                         }}>
-//                                         Generate Array
-//                                     </Button>
-//                                 </Box>
-//                             </Grid>
-//                             <ButtonGroup className={classes.btnContainer} variant='text' color='secondary'>
-//                                 <Button 
-//                                     className={classes.sortBtn}
-//                                     onClick={ () => {
-//                                         setSort('bubble')
-//                                         setPaused(false)
-//                                     }}
-//                                 >
-//                                     Bubble Sort
-//                                 </Button>
-//                                 <Button 
-//                                     className={classes.sortBtn} 
-//                                 >
-//                                     Selection Sort
-//                                 </Button>
-//                                 <Button 
-//                                     className={classes.sortBtn} 
-//                                 >
-//                                     Merge Sort
-//                                 </Button>
-//                             </ButtonGroup>
-//                         </Grid>
-//                     </Toolbar>
-//                 </AppBar>
-//                 <Toolbar /> */}
